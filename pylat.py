@@ -29,7 +29,7 @@ class Pylat(object):
         from getpass import getpass
         #
         self.rs = SessionOverride(self)
-        #self.rs = requests.Session()
+        self.apic = apic
         self._aci_dict = {
                           'aaaLogin': 'https://%s/api/aaaLogin.xml' % apic,
                           'aaaRefresh': 'https://%s/api/aaaRefresh.xml' % apic,
