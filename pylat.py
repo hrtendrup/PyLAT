@@ -80,7 +80,7 @@ class Pylat(object):
             self.last_response = self.rs.post(self._aci_dict['aaaLogin'], data=aaaUser_data, verify=self.cert)
             resp = etree.fromstring(self.last_response.text.encode())
         self.timeout = int(resp.find('.//aaaLogin').attrib['refreshTimeoutSeconds'] )
-        self.refresh_thread = threading.Timer(int(self.timeout * .9), self.refresh)
+        self.refresh_thread = threading.Timer(int(self.timeout * self._refresh_interval), self.refresh)
         if session_keepalive:
             self.refresh_thread.start()
         else:
