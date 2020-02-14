@@ -130,14 +130,41 @@ class SessionOverride(requests.Session):
         self.apic_object = apic_object
         super().__init__()
     #
+##    def get(self, *args, **kwargs):
+##        self.apic_object.last_response = super().get(*args, **kwargs)
+##        return self.apic_object.last_response
+##    #
+##    def post(self, *args, **kwargs):
+##        self.apic_object.last_response = super().post(*args, **kwargs)
+##        return self.apic_object.last_response
+##    #
+##    def delete(self, *args, **kwargs):
+##        self.apic_object.last_response = super().delete(*args, **kwargs)
+##        return self.apic_object.last_response
+    #
     def get(self, *args, **kwargs):
-        self.apic_object.last_response = super().get(*args, **kwargs)
+        from requests.exceptions import MissingSchema
+        try:
+            self.apic_object.last_response = super().get(*args, **kwargs)
+        except MissingSchema:
+            kwargs['url'] = 'https://' + self.apic_object.apic + '/' + kwargs.get('url', args[0])
+            self.apic_object.last_response = super().get(**kwargs)
         return self.apic_object.last_response
     #
     def post(self, *args, **kwargs):
-        self.apic_object.last_response = super().post(*args, **kwargs)
+        from requests.exceptions import MissingSchema
+        try:
+            self.apic_object.last_response = super().post(*args, **kwargs)
+        except MissingSchema:
+            kwargs['url'] = 'https://' + self.apic_object.apic + '/' + kwargs.get('url', args[0])
+            self.apic_object.last_response = super().post(**kwargs)
         return self.apic_object.last_response
     #
     def delete(self, *args, **kwargs):
-        self.apic_object.last_response = super().delete(*args, **kwargs)
+        from requests.exceptions import MissingSchema
+        try:
+            self.apic_object.last_response = super().delete(*args, **kwargs)
+        except MissingSchema:
+            kwargs['url'] = 'https://' + self.apic_object.apic + '/' + kwargs.get('url', args[0])
+            self.apic_object.last_response = super().delete(**kwargs)
         return self.apic_object.last_response
