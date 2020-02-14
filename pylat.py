@@ -29,12 +29,13 @@ class Pylat(object):
         from getpass import getpass
         #
         self.rs = SessionOverride(self)
-        self.apic = apic
+        self._refresh_interval = 0.9
         self._aci_dict = {
                           'aaaLogin': 'https://%s/api/aaaLogin.xml' % apic,
                           'aaaRefresh': 'https://%s/api/aaaRefresh.xml' % apic,
                           'aaaLogout': 'https://%s/api/aaaLogout.xml' % apic,
                          }
+        self.apic = apic
         self.last_response = None
         self.get = self.rs.get
         self.post = self.rs.post
@@ -102,7 +103,7 @@ class Pylat(object):
         import threading
         self.last_response = self.rs.get(self._aci_dict['aaaRefresh'])
         if self.refresh_thread.isAlive():
-            self.refresh_thread = threading.Timer(int(self.timeout * .9), self.refresh)
+            self.refresh_thread = threading.Timer(int(self.timeout * self._refresh_interval), self.refresh)
             self.refresh_thread.start()
         else:
             pass
