@@ -49,6 +49,7 @@ class Pylat(object):
         except KeyError:
             self.password = getpass("Enter password for %s: " % self.username)
         try:
+            ## may consider making /etc/ssl/certs/ca-certificates.crt default
             self.cert = kwargs['cert']
         except KeyError:
             print("Certificates not verified")
@@ -81,6 +82,7 @@ class Pylat(object):
             resp = etree.fromstring(self.last_response.text.encode())
         self.timeout = int(resp.find('.//aaaLogin').attrib['refreshTimeoutSeconds'] )
         self.refresh_thread = threading.Timer(int(self.timeout * self._refresh_interval_ratio), self.refresh)
+        self.refresh_thread.setDaemon(True)
         if session_keepalive:
             self.refresh_thread.start()
         else:
@@ -91,7 +93,7 @@ class Pylat(object):
     def logout(self):
         self.last_response = self.rs.post(self._aci_dict['aaaLogout'], data='<aaaUser name="%s" />' % self.username, verify=self.cert)
         if self.refresh_thread.isAlive():
-          self.refresh_thread.cancel()
+            self.refresh_thread.cancel()
         return None
     #
 
@@ -103,7 +105,9 @@ class Pylat(object):
         import threading
         self.last_response = self.rs.get(self._aci_dict['aaaRefresh'])
         if self.refresh_thread.isAlive():
+            self.refresh_thread.cancel()
             self.refresh_thread = threading.Timer(int(self.timeout * self._refresh_interval_ratio), self.refresh)
+            self.refresh_thread.setDaemon(True)
             self.refresh_thread.start()
         else:
             pass
